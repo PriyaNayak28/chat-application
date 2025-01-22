@@ -1,0 +1,90 @@
+
+body {
+    background-color: #070b0e;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.intro-screen {
+    width: 100%;
+    height: 100vh;
+    background-color: #f0f8ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.intro-screen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+}
+.form-container {
+    width: 400px;
+    height: 500px;
+    background-color: #0e0202;
+    border-radius: 15px;
+    box-shadow: 1px 5px 15px 12px rgb(15, 208, 249); /* Original shadow color */
+    padding: 20px;
+    box-sizing: border-box;
+    transition: box-shadow 0.3s, color 0.3s; /* Smooth transition for hover effect */
+}
+
+.form-container:hover {
+    box-shadow: 1px 5px 15px 12px rgb(13, 150, 240); /* Purple shadow when hovering */
+}
+
+h2 {
+    text-align: center;
+    color: #faf6f6;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: rgb(15, 208, 249); /* Original button color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.form-container:hover button {
+    background-color:  rgb(13, 150, 240);/* Purple button when hovering over form */
+}
+
+button:hover {
+    background-color: rgb(7, 132, 160);
+}
+
+.toggle-link {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    color: #0077cc;
+    cursor: pointer;
+    transition: color 0.3s; /* Smooth transition for hover effect */
+}
+
+.form-container:hover .toggle-link {
+    color:  rgb(13, 150, 240); /* Purple link color when hovering over form */
+}
