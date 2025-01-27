@@ -1,9 +1,26 @@
 
     const supabaseUrl = 'https://ttknpqkivcyktqjhoakz.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a25wcWtpdmN5a3RxamhvYWt6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc1ODAxMjcsImV4cCI6MjA1MzE1NjEyN30.gBLwawXaurnS4_AhcMzKfVegb984_31e1m3SLvJ4l7w'
+    const supaservicerole='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0a25wcWtpdmN5a3RxamhvYWt6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNzU4MDEyNywiZXhwIjoyMDUzMTU2MTI3fQ.0r7mrEUn4BgxfWEpH62l1j7Pls3R8qHIT_9U5xT673k'
     // const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const supabase = window.supabase.createClient(supabaseUrl, supaservicerole);
 
+    let channel;
+    let sessionData;
+
+document.addEventListener('DOMContentLoaded', () => {
+     sessionData = JSON.parse(localStorage.getItem('supabaseSession'));
+    console.log("session",sessionData)
+    if (sessionData && sessionData.data.session) {
+        restoreSession();
+    } else {
+        document.getElementById('sign-in-form').style.display = 'block';
+        document.getElementById('sign-up-form').style.display = 'none';
+        document.getElementById('main-page').style.display = 'none';
+    }
+});
+
+// signUp 
     async function signUp() {
         const email = document.getElementById('email-signup').value;
         const password = document.getElementById('password-signup').value;
@@ -12,7 +29,7 @@
         const { user, error } = await supabase.auth.signUp({
             email,
             password,
-            options: { data: { username } }
+            options: { data: { display_name : username } }
         });
 
         if (error) {
@@ -23,20 +40,253 @@
         }
     }
 
+// signin
     async function signIn() {
         const email = document.getElementById('email-signin').value;
         const password = document.getElementById('password-signin').value;
     
+        // Sign in the user with email and password
         const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password
         });
     
+        console.log("Sign-in Response Data:", data);
+    
         if (error) {
             alert('Error: ' + error.message);
         } else if (data && data.user) {
-            alert('Sign-in successful! Welcome ' + data.user.email);
+            const displayName = data.user.user_metadata.display_name;
+            console.log("Signed-in User Display Name:", displayName);
+            alert('Sign-in successful! Welcome ' + displayName);
+    
+            // Store the session in localStorage for persistence
+            const sessionData = await supabase.auth.getSession();
+            localStorage.setItem('supabaseSession', JSON.stringify(sessionData));
+    
+            // Update the UI
+            document.getElementById('sign-in-form').style.display = 'none';
+            document.getElementById('sign-up-form').style.display = 'none';
+            document.getElementById('main-page').style.display = 'block';
+    
+            // Load users and subscribe to messages
+            allusers();
+            subscribeToMessages();
+        }
+    }
+
+    async function restoreSession() {
+        if (sessionData) {
+            const { data, error } = await supabase.auth.getSession();
+    
+            if (data && data.session) {
+                const loggedInUser = data.session.user;
+                console.log('Restored Session User:', loggedInUser);
+    
+                // Update the UI for logged-in user
+                document.getElementById('sign-in-form').style.display = 'none';
+                document.getElementById('sign-up-form').style.display = 'none';
+                document.getElementById('main-page').style.display = 'block';
+    
+                // Load users and restore chat messages
+                await allusers();
+                if (selectedUser) {
+                    startChat(selectedUser.id, selectedUser.name); 
+                }
+            } else if (error) {
+                console.error('Error restoring session:', error.message);
+            }
+        } else {
+            console.log('No session found in localStorage.');
         }
     }
     
+    
+    // Logout 
+    async function logout() {
+        await supabase.auth.signOut();
+        document.getElementById('main-page').style.display = 'none';
+        document.getElementById('sign-in-form').style.display = 'block';
+        document.getElementById('messages').innerHTML = ''; 
+        selectedUser = null; 
+        localStorage.removeItem('supabaseSession');
+    }
+    
+
+    // get all users 
+    async function allusers() {
+        try {
+            const { data: sessionData } = await supabase.auth.getSession();
+            const loggedInEmail = sessionData?.session?.user?.email;
+    
+            if (!loggedInEmail) {
+                console.error('No logged-in user found.');
+                return;
+            }
+    
+            const { data: { users }, error } = await supabase.auth.admin.listUsers();
+            console.log("usersssss",users)
+    
+            if (error) {
+                console.error('Error fetching users:', error.message);
+            } else {
+               
+                const filteredUsers = users.filter(user => user.email !== loggedInEmail);
+                console.log("filteredUsers1",filteredUsers)
+                const userListElement = document.getElementById('user-list');
+                console.log("filter",filteredUsers)
+                userListElement.innerHTML = ''; 
+    
+                filteredUsers.forEach(user => {
+                    const userItem = document.createElement('li');
+                    const userButton = document.createElement('button');
+                    userButton.classList.add('user-button'); 
+                    userButton.textContent =  user.user_metadata.display_name;  
+                    userButton.onclick = function() {
+                        startChat(user.id, user.user_metadata.display_name);
+                    };    
+                    userItem.appendChild(userButton);
+                    userListElement.appendChild(userItem);
+                });
+            }
+        } catch (err) {
+            console.error('Unexpected error:', err.message);
+        }
+    }
+    
+    
+    function subscribeToMessages() {
+        channel = supabase
+            .channel('chat_channel')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+                const newMessage = payload.new;
+                if (newMessage.receiver_id === selectedUser.id || newMessage.sender_id === selectedUser.id) {
+                    displayMessage(newMessage.content, newMessage.sender_name , newMessage.created_at);
+                }
+            })
+            .subscribe();
+    }
+    
+    // Display message in chat UI
+    function displayMessage(messageContent, senderName) {
+        const messages = document.getElementById('messages');
+        const messageBubble = document.createElement('div');
+        messageBubble.textContent = `${senderName}: ${messageContent}`;
+        messageBubble.style.padding = '10px';
+        messageBubble.style.margin = '5px 0';
+        messageBubble.style.backgroundColor = '#e1ffe7';
+        messageBubble.style.borderRadius = '5px';
+        messages.appendChild(messageBubble);
+    }
+    
+    // Select user to chat
+    let selectedUser = null;
+
+    async function startChat(receiverId, receiverName) {
+        selectedUser = { id: receiverId, name: receiverName };
+        localStorage.setItem('selectedUser', JSON.stringify(selectedUser)); // Save to local storage
+    
+        document.getElementById('message-container').style.display = 'block';
+        document.getElementById('message-input').focus();
+        document.getElementById('users-header').textContent = `${receiverName}`;
+    
+        // Clear existing messages
+        const messagesContainer = document.getElementById('messages');
+        messagesContainer.innerHTML = '';
+    
+        // Fetch chat messages from the database
+        try {
+            const { data, error } = await supabase
+                .from('messages')
+                .select('*')
+                .or(
+                    `and(sender_id.eq.${receiverId},receiver_id.eq.${selectedUser.id}),and(sender_id.eq.${selectedUser.id},receiver_id.eq.${receiverId})`
+                )
+                .order('created_at', { ascending: true });
+    
+            if (error) {
+                console.error('Error fetching messages:', error.message);
+                return;
+            }
+    
+            // Display messages
+            data.forEach((message) => {
+                displayMessage(message.content, message.sender_name);
+            });
+        } catch (err) {
+            console.error('Unexpected error fetching messages:', err.message);
+        }
+    }
+    
+    
+    
+    // Send message to Supabase and display it
+    async function sendMessage() {
+        const input = document.getElementById('message-input');
+        console.log("input" ,input);
+        if (input.value.trim()) {
+            const { data: user, error } = await supabase.auth.getUser();
+            console.log(user , "user123456");
+            
+
+            if (error) {
+                console.error('Error fetching user:', error);
+                return;
+            }
+    
+            if (user) {
+                const senderName = user.user.user_metadata.display_name;
+                let created_at = user.user.created_at
+                console.log(senderName , "snederName")
+                const { data, error } = await supabase
+                    .from('messages')
+                    .insert([
+                        {
+                            content: input.value,
+                            receiver_id: selectedUser.id,
+                            sender_id: user.user.id,  
+                            sender_name: senderName,
+                            created_at : created_at
+                        }
+                    ]);
+    
+                if (error) {
+                    console.error('Error sending message:', error);
+                } else {
+                    input.value = ''; 
+                }
+            } else {
+                console.error('No authenticated user found.');
+            }
+        }
+    }
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

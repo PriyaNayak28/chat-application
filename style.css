@@ -31,14 +31,14 @@ body {
     height: 500px;
     background-color: #0e0202;
     border-radius: 15px;
-    box-shadow: 1px 5px 15px 12px rgb(15, 208, 249); /* Original shadow color */
-    padding: 20px;
+    box-shadow: 1px 5px 15px 12px rgb(15, 208, 249); 
+     padding: 20px;
     box-sizing: border-box;
-    transition: box-shadow 0.3s, color 0.3s; /* Smooth transition for hover effect */
+    transition: box-shadow 0.3s, color 0.3s;  
 }
 
 .form-container:hover {
-    box-shadow: 1px 5px 15px 12px rgb(13, 150, 240); /* Purple shadow when hovering */
+    box-shadow: 1px 5px 15px 12px rgb(13, 150, 240); 
 }
 
 h2 {
@@ -60,16 +60,16 @@ input[type="password"] {
 button {
     width: 100%;
     padding: 10px;
-    background-color: rgb(15, 208, 249); /* Original button color */
+    background-color: rgb(15, 208, 249); 
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
+    transition: background-color 0.3s; 
 }
 
 .form-container:hover button {
-    background-color:  rgb(13, 150, 240);/* Purple button when hovering over form */
+    background-color:  rgb(13, 150, 240);
 }
 
 button:hover {
@@ -82,9 +82,93 @@ button:hover {
     margin-top: 10px;
     color: #0077cc;
     cursor: pointer;
-    transition: color 0.3s; /* Smooth transition for hover effect */
+    transition: color 0.3s; 
 }
 
 .form-container:hover .toggle-link {
-    color:  rgb(13, 150, 240); /* Purple link color when hovering over form */
+    color:  rgb(13, 150, 240); 
+}
+
+ 
+  #main-page {
+    display: none;
+            width: 80%;
+            height: 90%;
+            background-color: #110303;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            overflow: hidden;
+}
+
+#user-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    flex: 1; 
+}
+
+#main-page ul li {
+    text-align: center;
+    padding: 10px;
+    background-color: #fff;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+#main-page #users-header {
+    text-align: center;
+    margin: 0;
+    padding: 10px;
+    background-color: #243d74;
+    color: white;
+}
+
+#user-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 100%;
+    overflow-y: auto;
+    border-right: 1px solid #ccc;
+}
+
+#user-list li {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #ccc;
+}
+
+#user-list li:hover {
+    background-color: #f0f0f0;
+}
+
+#main-content {
+    display: flex;
+    flex-direction: column;
+}
+
+#message-container {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+}
+
+#message-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+ } 
+
+#send-message {
+    margin-left: 10px;
+    padding: 10px;
+    background-color: #243d74;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
