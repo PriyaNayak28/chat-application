@@ -32,27 +32,32 @@
         <span class="toggle-link" onclick="toggleForms()">Don't have an account? Sign Up</span>
     </div>
 
-      <!-- Main Page (User List + Chat UI)  -->
-    <div id="main-page" style="display: none;">
-        <div id="sidebar">
-            <h3 id="users-header">Users</h3>
-            <ul id="user-list"></ul>
-        </div>
-        <div id="chat-box">
-            <h3 id="chat-header">Select a User to Chat</h3>
-            <div id="messages" class="messages"></div>
-            <div id="message-container" style="display: none;">
-                <input type="text" id="message-input" placeholder="Type your message here...">
-                <button id="send-message" onclick="sendMessage()">Send</button>
+    <div id="main-page" style="display: none; display: flex; height: 100vh;">
+        <!-- Sidebar  -->
+            <div id="sidebar" style="width: 40%; background: #f0f0f0; padding: 15px; overflow-y: auto; height: 100vh;">
+                <h3>Users</h3>
+                <ul id="user-list" style="list-style: none; padding: 0;"></ul>
+            </div>
+           
+        <div id="chat-box" style="flex: 1; display: flex; flex-direction: column; height: 100vh;">
+             <!-- Header with Logout Button   -->
+            <div id="chat-header" style="padding: 15px; background: #007bff; color: white; display: flex; justify-content: space-between; align-items: center;">
+                <h3 id="chat-title">Choose a user to chat</h3>
+                <button id="logout-button" onclick="logout()" style="background: red; color: white; border: none; padding: 5px 8px; cursor: pointer; font-size: 0.8em; border-radius: 3px;">Logout</button>
+            </div>
+            
+            
+            <div id="messages" class="messages" style="flex: 1; padding: 15px; overflow-y: auto; background: #ffffff; display: flex; flex-direction: column;"></div>
+            
+           
+            <div id="message-container" style="display: flex; padding: 10px; background: #f8f9fa;">
+                <input type="text" id="message-input" placeholder="Type your message here..." style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                <button id="send-message" onclick="sendMessage()" style="margin-left: 10px; background: #007bff; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Send</button>
             </div>
         </div>
-        <!-- logout button  -->
-    <div>
-        <button id="logout-button" onclick="logout()">Logout</button>
-    </div>
-    </div>
+    </div> 
 
-
+ 
 
     <script>
         setTimeout(function() {
