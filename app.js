@@ -101,7 +101,7 @@ async function restoreSession() {
                 selectedUser = savedSelectedUser;
 
                 // Update the UI for the restored chat
-                document.getElementById('users-header').textContent = `Chat with ${selectedUser.name}`;
+                document.getElementById('chat-title"').textContent = `${selectedUser.name}`;
                 document.getElementById('message-container').style.display = 'block';
                 document.getElementById('message-input').focus();
 
