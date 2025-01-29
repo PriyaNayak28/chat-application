@@ -218,26 +218,6 @@ function subscribeToMessages() {
 }
 
 
-
-
-
-
-
-// function displayMessage(messageContent, senderName , created_at) {
-//     const messages = document.getElementById('messages');
-//     const messageBubble = document.createElement('div');
-//     messageBubble.textContent = `${senderName}: ${messageContent} ${new Date(created_at).toLocaleTimeString()}`;
-//     messageBubble.style.padding = '10px';
-//     messageBubble.style.margin = '5px 0';
-//     messageBubble.style.backgroundColor = '#e1ffe7';
-//     messageBubble.style.borderRadius = '5px';
-//     messages.appendChild(messageBubble);
-//     messages.scrollTop = messages.scrollHeight;
-// }
-
-// Select user to chat
-
-
 function displayMessage(messageContent, senderName, created_at) {
     const messages = document.getElementById('messages');
     const messageBubble = document.createElement('div');
@@ -265,48 +245,6 @@ function displayMessage(messageContent, senderName, created_at) {
 }
 
 let selectedUser = null;
-
-// async function startChat(receiverId, receiverName) {
-//     selectedUser = { id: receiverId, name: receiverName };
-//     localStorage.setItem('selectedUser', JSON.stringify(selectedUser));
-
-//     document.getElementById('message-container').style.display = 'block';
-//     document.getElementById('message-input').focus();
-//     document.getElementById('users-header').textContent = `${receiverName}`;
-
-//     // Clear existing messages
-//     const messagesContainer = document.getElementById('messages');
-//     messagesContainer.innerHTML = '';
-
-//     // Fetch chat messages from the database
-//     try {
-//         const { data, error } = await supabase
-//             .from('messages')
-//             .select('*')
-//             .or(
-//                 `and(sender_id.eq.${receiverId},receiver_id.eq.${sessionData.data.session.user.id}),and(sender_id.eq.${sessionData.data.session.user.id},receiver_id.eq.${receiverId})`
-//             )
-//             .order('created_at', { ascending: true });
-
-//         if (error) {
-//             console.error('Error fetching messages:', error.message);
-//             return;
-//         }
-
-//         // Display messages
-//         data.forEach((message) => {
-//             displayMessage(message.content, message.sender_name, message.created_at);
-//         });
-//     } catch (err) {
-//         console.error('Unexpected error fetching messages:', err.message);
-//     }
-// }
-
-
-
-
-
-// Send message to Supabase and display it
 
 
 async function startChat(receiverId, receiverName) {
@@ -353,20 +291,6 @@ async function startChat(receiverId, receiverName) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 async function sendMessage() {
     const input = document.getElementById('message-input');
 
@@ -411,5 +335,3 @@ async function sendMessage() {
         console.error('Unexpected error sending message:', err.message);
     }
 }
-
-

@@ -32,9 +32,9 @@
         <span class="toggle-link" onclick="toggleForms()">Don't have an account? Sign Up</span>
     </div>
 
-    <div id="main-page" style="display: none; display: flex; height: 100vh;">
-        <!-- Sidebar  -->
-            <div id="sidebar" style="width: 40%; background: #f0f0f0; padding: 15px; overflow-y: auto; height: 100vh;">
+     <div id="main-page" style="display: none; display: flex; height: 100vh;">
+        <!-- Sidebar   -->
+            <div id="sidebar" style="width: 80%; background: #f0f0f0; padding: 15px; overflow-y: auto; height: 100vh;">
                 <h3>Users</h3>
                 <ul id="user-list" style="list-style: none; padding: 0;"></ul>
             </div>
@@ -43,7 +43,7 @@
              <!-- Header with Logout Button   -->
             <div id="chat-header" style="padding: 15px; background: #007bff; color: white; display: flex; justify-content: space-between; align-items: center;">
                 <h3 id="chat-title">Choose a user to chat</h3>
-                <button id="logout-button" onclick="logout()" style="background: red; color: white; border: none; padding: 5px 8px; cursor: pointer; font-size: 0.8em; border-radius: 3px;">Logout</button>
+                <button id="logout-button" onclick="logout()" style="background: rgb(237, 241, 242); color: rgb(16, 1, 1); border: none; padding: 2px 2px; cursor: pointer; font-size: 0.6em; border-radius: 2px; width: 150px; height: 50px;">Logout</button>
             </div>
             
             
@@ -55,9 +55,7 @@
                 <button id="send-message" onclick="sendMessage()" style="margin-left: 10px; background: #007bff; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Send</button>
             </div>
         </div>
-    </div> 
-
- 
+    </div>  
 
     <script>
         setTimeout(function() {
