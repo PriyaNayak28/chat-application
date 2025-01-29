@@ -78,26 +78,39 @@ async function signIn() {
 // restoreSession
 
 async function restoreSession() {
-    if (sessionData) {
+    const sessionData = JSON.parse(localStorage.getItem('supabaseSession'));
+
+    if (sessionData && sessionData.data.session) {
         const { data, error } = await supabase.auth.getSession();
 
         if (data && data.session) {
             const loggedInUser = data.session.user;
             console.log('Restored Session User:', loggedInUser);
 
-            // Update the UI for logged-in user
+            // Update the UI for the logged-in user
             document.getElementById('sign-in-form').style.display = 'none';
             document.getElementById('sign-up-form').style.display = 'none';
             document.getElementById('main-page').style.display = 'block';
 
-            // Load users
+            // Load the list of users
             await allusers();
 
-            // Restore chat with the previously selected user
+            // Restore the selected user (if any) from localStorage
             const savedSelectedUser = JSON.parse(localStorage.getItem('selectedUser'));
             if (savedSelectedUser) {
-                await startChat(savedSelectedUser.id, savedSelectedUser.name); // Restore chat
+                selectedUser = savedSelectedUser;
+
+                // Update the UI for the restored chat
+                document.getElementById('users-header').textContent = `Chat with ${selectedUser.name}`;
+                document.getElementById('message-container').style.display = 'block';
+                document.getElementById('message-input').focus();
+
+                // Fetch and display messages for the restored chat
+                await startChat(selectedUser.id, selectedUser.name);
             }
+
+            // Subscribe to new messages
+            subscribeToMessages();
         } else if (error) {
             console.error('Error restoring session:', error.message);
         }
@@ -161,58 +174,65 @@ async function allusers() {
     }
 }
 
+// Display message in chat UI
+
 function subscribeToMessages() {
-    const { data: sessionData } = supabase.auth.getSession();
-    const loggedInUser = sessionData?.session?.user;
+    supabase.auth.getSession().then(({ data: sessionData }) => {
+        const loggedInUser = sessionData?.session?.user;
 
-    if (!loggedInUser) {
-        console.error('No logged-in user found for subscription.');
-        return;
-    }
+        if (!loggedInUser) {
+            console.error('No logged-in user found for subscription.');
+            return;
+        }
 
-    channel = supabase
-        .channel('chat_channel')
-        .on(
-            'postgres_changes',
-            { event: 'INSERT', schema: 'public', table: 'messages' },
-            (payload) => {
-                const newMessage = payload.new;
+        channel = supabase
+            .channel('chat_channel')
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'messages' },
+                (payload) => {
+                    const newMessage = payload.new;
 
-                // Check if the message involves the logged-in user
-                if (
-                    newMessage.receiver_id === loggedInUser.id ||
-                    newMessage.sender_id === loggedInUser.id
-                ) {
-                    // Display the message in the UI if the chat is active with the involved user
+                    // Check if the message involves the logged-in user
                     if (
-                        selectedUser &&
-                        (newMessage.receiver_id === selectedUser.id ||
-                            newMessage.sender_id === selectedUser.id)
+                        newMessage.receiver_id === loggedInUser.id ||
+                        newMessage.sender_id === loggedInUser.id
                     ) {
-                        displayMessage(
-                            newMessage.content,
-                            newMessage.sender_name,
-                            newMessage.created_at
-                        );
+                        // Display the message in the UI if the chat is active with the involved user
+                        if (
+                            selectedUser &&
+                            (newMessage.receiver_id === selectedUser.id ||
+                                newMessage.sender_id === selectedUser.id)
+                        ) {
+                            displayMessage(
+                                newMessage.content,
+                                newMessage.sender_name,
+                                newMessage.created_at
+                            );
+                        }
                     }
                 }
-            }
-        )
-        .subscribe();
+            )
+            .subscribe((status) => console.log('Subscription status:', status));
+    });
 }
 
 
 
-// Display message in chat UI
-function displayMessage(messageContent, senderName) {
+
+
+
+
+function displayMessage(messageContent, senderName , created_at) {
     const messages = document.getElementById('messages');
     const messageBubble = document.createElement('div');
-    messageBubble.textContent = `${senderName}: ${messageContent}`;
+    messageBubble.textContent = `${senderName}: ${messageContent} ${new Date(created_at).toLocaleTimeString()}`;
     messageBubble.style.padding = '10px';
     messageBubble.style.margin = '5px 0';
     messageBubble.style.backgroundColor = '#e1ffe7';
     messageBubble.style.borderRadius = '5px';
     messages.appendChild(messageBubble);
+    messages.scrollTop = messages.scrollHeight;
 }
 
 // Select user to chat
@@ -268,6 +288,8 @@ async function sendMessage() {
     }
 
     const { data: user, error } = await supabase.auth.getUser();
+    // console.log(data , "data123");
+    console.log(user , "user123")
 
     if (error || !user) {
         console.error('Error fetching user:', error || 'No user found.');
@@ -280,6 +302,7 @@ async function sendMessage() {
     }
 
     const senderName = user.user.user_metadata.display_name;
+   
 
     try {
         const { error } = await supabase.from('messages').insert([
